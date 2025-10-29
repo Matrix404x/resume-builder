@@ -6,6 +6,8 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Stack, TextField } from '@mui/material';
+import { addResumeAPI } from '../services/allAPI';
+import { addResumeAPI } from '../services/allAPI';
 
 function Steps({ userInput, setUserInput }) {
   // console.log(userInput);
@@ -177,12 +179,17 @@ const removeSkill=(skill)=>
 
 // handleAddResume
 
-const handleAddResume =()=>{
+const handleAddResume = async()=>{
   // alert("api called")
   const{name,jobTitle,location}=userInput.personalDetails
 
   if(name && jobTitle && location){
-    alert("api called")
+    // alert("api called")
+    try {
+      const result = await addResumeAPI(userInput)
+    } catch (err) {
+      console.log(err)
+    }
   }
   else{
     alert("please fill missing fields")
