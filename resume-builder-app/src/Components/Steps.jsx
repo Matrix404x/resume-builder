@@ -70,9 +70,11 @@ function Steps({ userInput, setUserInput }) {
     }
   }
 
-  const removeSkill=(skill)=>{
-    setUserInput({...userInput,skills:userInput.skills.filter(item=>item!=skill)})
-  }
+// removeSkill
+const removeSkill=(skill)=>
+{
+  setUserInput({...userInput,skills:userInput.skills.filter(item=>item!=skill)})
+}
 
   const renderStepContent = (step) => {
     switch (step) {
@@ -91,9 +93,13 @@ function Steps({ userInput, setUserInput }) {
           <h3>Contact Details</h3>
           <div className='d-flex row p-3'>
             <TextField id="Standard-basic" label="Email" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, email: e.target.value } })} value={userInput.personalDetails.email} />
+              
             <TextField id="Standard-basic" label="Phone Number" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, phone: e.target.value } })} value={userInput.personalDetails.phone} />
+
             <TextField id="Standard-basic" label="Github Profile Link" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, github: e.target.value } })} value={userInput.personalDetails.github} />
+
             <TextField id="Standard-basic" label="Linkedin Profile Link" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, linkedIn: e.target.value } })} value={userInput.personalDetails.linkedIn} />
+
             <TextField id="Standard-basic" label="Portfolio Link" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, portfolio: e.target.value } })} value={userInput.personalDetails.portfolio} />
           </div>
         </div>
@@ -148,7 +154,7 @@ function Steps({ userInput, setUserInput }) {
                 <div className="d-flex justify-content-between">
                   {
                     userInput.skills.length > 0 ? userInput.skills.map(skill => (
-                      <span className='btn btn-primary d-flex align-items-center justify-content-center'>{skill} <button className='btn text-light'>X</button></span>
+                      <span className='btn btn-primary d-flex align-items-center justify-content-center'>{skill} <button onClick={()=>removeSkill(skill)} className='btn text-light'>X</button></span>
                     )) : <p>nothing to display</p>
                   }
                 </div>
@@ -161,7 +167,7 @@ function Steps({ userInput, setUserInput }) {
         <div>
           <h3>Proffesional Summary</h3>
           <div className='d-flex row p-3'>
-            <TextField id="Standard-multiline-static" label="write a short summary your self" multiline rows={4} defaultValue="Eg:im passionate full-stack developer" variant="standard" onChange={e => setUserInput({ ...userInput, summary: e.target.value })} value={userInput.summary} />
+            <TextField id="Standard-multiline-static" label="write a short summary your self" multiline rows={4} defaultValue="Eg:im passionate full-stack developer" variant="standard" onChange={e => setUserInput({ ...userInput, summary: e.target.value })} value={userInput.summary.duration} />
           </div>
         </div>
       )
@@ -169,7 +175,11 @@ function Steps({ userInput, setUserInput }) {
     }
   }
 
+// handleAddResume
 
+const handleAddResume =()=>{
+  alert("api called")
+}
 
 
   return (
@@ -226,9 +236,13 @@ function Steps({ userInput, setUserInput }) {
                   Skip
                 </Button>
               )}
-              <Button onClick={handleNext}>
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-              </Button>
+              {activeStep === steps.length - 1
+              ?
+              <Button onClick={handleAddResume}>Finish</Button>:
+              <Button onClick={handleNext}>NEXT</Button>
+              }
+                  
+              
             </Box>
           </React.Fragment>
         )}
