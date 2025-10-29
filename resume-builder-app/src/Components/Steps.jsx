@@ -178,7 +178,15 @@ const removeSkill=(skill)=>
 // handleAddResume
 
 const handleAddResume =()=>{
-  alert("api called")
+  // alert("api called")
+  const{name,jobTitle,location}=userInput.personalDetails
+
+  if(name && jobTitle && location){
+    alert("api called")
+  }
+  else{
+    alert("please fill missing fields")
+  }
 }
 
 
