@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Stack, TextField } from '@mui/material';
 import { addResumeAPI } from '../services/allAPI';
-import { addResumeAPI } from '../services/allAPI';
+
 
 function Steps({ userInput, setUserInput }) {
   // console.log(userInput);

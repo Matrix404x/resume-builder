@@ -1,4 +1,67 @@
 {
-    "resumes" : [],
-    "history" : []
+  "resumes": [
+    {
+      "personalDetails": {
+        "name": "Ashish",
+        "jobTitle": "Developer",
+        "location": "Kakkanad",
+        "email": "caecacaefacaaeca",
+        "phone": "aubfeb",
+        "github": "fbusbeus",
+        "linkedIn": "bwusef",
+        "portfolio": "fbwia"
+      },
+      "education": {
+        "course": "asfefe",
+        "college": "fefa",
+        "university": "fawwe",
+        "year": "fewaf"
+      },
+      "experience": {
+        "job": "fawweffa",
+        "company": "faewf",
+        "location": "fawfwf",
+        "duration": "asdwada"
+      },
+      "skills": [
+        "adwad",
+        "ANGULAR",
+        "EXPRESS"
+      ],
+      "summary": "Eg:im passionate full-stack developerdawDWadw",
+      "id": 1
+    },
+    {
+      "personalDetails": {
+        "name": "Ashish",
+        "jobTitle": "Developer",
+        "location": "Kakkanad",
+        "email": "caecacaefacaaeca",
+        "phone": "aubfeb",
+        "github": "fbusbeus",
+        "linkedIn": "bwusef",
+        "portfolio": "fbwia"
+      },
+      "education": {
+        "course": "asfefe",
+        "college": "fefa",
+        "university": "fawwe",
+        "year": "fewaf"
+      },
+      "experience": {
+        "job": "fawweffa",
+        "company": "faewf",
+        "location": "fawfwf",
+        "duration": "asdwada"
+      },
+      "skills": [
+        "adwad",
+        "ANGULAR",
+        "EXPRESS"
+      ],
+      "summary": "Eg:im passionate full-stack developerdawDWadw",
+      "id": 2
+    }
+  ],
+  "history": []
 }
