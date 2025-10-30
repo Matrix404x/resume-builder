@@ -7,9 +7,10 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Stack, TextField } from '@mui/material';
 import { addResumeAPI } from '../services/allAPI';
+import swal from 'sweetalert';
 
 
-function Steps({ userInput, setUserInput }) {
+function Steps({ userInput, setUserInput, setFinish }) {
   // console.log(userInput);
 
   const steps = ['Basic Information', 'Contact Details', 'Education Details', 'Work Experience', 'Skills & Certification', 'Review & Submit'];
@@ -187,12 +188,17 @@ const handleAddResume = async()=>{
     // alert("api called")
     try {
       const result = await addResumeAPI(userInput)
+      console.log(result)
+      swal("Success", "Resume added", "success");
+      setFinish(true)
     } catch (err) {
       console.log(err)
+      swal("Error", "Resume failed", "error");
+
     }
   }
   else{
-    alert("please fill missing fields")
+    swal("Error", "Resume failed", "error");
   }
 }
 
