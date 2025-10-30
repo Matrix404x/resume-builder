@@ -6,21 +6,139 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Stack, TextField } from '@mui/material';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { addResumeAPI } from '../services/allAPI';
 import swal from 'sweetalert';
 
-
 function Steps({ userInput, setUserInput, setFinish }) {
-  // console.log(userInput);
+  const steps = [
+    'Basic Information',
+    'Contact Details',
+    'Education Details',
+    'Work Experience',
+    'Skills & Certification',
+    'Review & Submit'
+  ];
 
-  const steps = ['Basic Information', 'Contact Details', 'Education Details', 'Work Experience', 'Skills & Certification', 'Review & Submit'];
-
-
-  const suggestionSkills = ['REACT', 'ANGULAR', 'NODE', 'EXPRESS', 'MONGODB', 'JAVASCRIPT', 'GIT', 'UI/UX']
+  const suggestionSkills = [
+    'REACT', 'ANGULAR', 'NODE', 'EXPRESS',
+    'MONGODB', 'JAVASCRIPT', 'GIT', 'UI/UX'
+  ];
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
   const userSkillRef = React.useRef();
+
+  // Validation Schema for each step
+  const validationSchemas = [
+    // Step 0: Basic Information
+    Yup.object({
+      personalDetails: Yup.object({
+        name: Yup.string()
+          .min(3, 'Name must be at least 3 characters')
+          .required('Full name is required'),
+        jobTitle: Yup.string()
+          .min(2, 'Job title must be at least 2 characters')
+          .required('Job title is required'),
+        location: Yup.string()
+          .min(2, 'Location must be at least 2 characters')
+          .required('Location is required'),
+      }),
+    }),
+    // Step 1: Contact Details (Optional step)
+    Yup.object({
+      personalDetails: Yup.object({
+        email: Yup.string()
+          .email('Invalid email address')
+          .notRequired(),
+        phone: Yup.string()
+          .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits')
+          .notRequired(),
+        github: Yup.string()
+          .url('Must be a valid URL')
+          .notRequired(),
+        linkedIn: Yup.string()
+          .url('Must be a valid URL')
+          .notRequired(),
+        portfolio: Yup.string()
+          .url('Must be a valid URL')
+          .notRequired(),
+      }),
+    }),
+    // Step 2: Education Details
+    Yup.object({
+      education: Yup.object({
+        course: Yup.string()
+          .min(2, 'Course name must be at least 2 characters')
+          .required('Course name is required'),
+        college: Yup.string()
+          .min(2, 'College name must be at least 2 characters')
+          .required('College name is required'),
+        university: Yup.string()
+          .min(2, 'University name must be at least 2 characters')
+          .required('University is required'),
+        year: Yup.string()
+          .matches(/^[0-9]{4}$/, 'Year must be 4 digits')
+          .required('Year is required'),
+      }),
+    }),
+    // Step 3: Work Experience
+    Yup.object({
+      experience: Yup.object({
+        job: Yup.string()
+          .min(2, 'Job title must be at least 2 characters')
+          .required('Job title is required'),
+        company: Yup.string()
+          .min(2, 'Company name must be at least 2 characters')
+          .required('Company name is required'),
+        location: Yup.string()
+          .min(2, 'Location must be at least 2 characters')
+          .required('Location is required'),
+        duration: Yup.string()
+          .min(2, 'Duration must be at least 2 characters')
+          .required('Duration is required'),
+      }),
+    }),
+    // Step 4: Skills
+    Yup.object({
+      skills: Yup.array()
+        .min(1, 'Add at least one skill')
+        .required('Skills are required'),
+    }),
+    // Step 5: Summary
+    Yup.object({
+      summary: Yup.string()
+        .min(20, 'Summary must be at least 20 characters')
+        .max(500, 'Summary must not exceed 500 characters')
+        .required('Professional summary is required'),
+    }),
+  ];
+
+  // Initialize Formik
+  const formik = useFormik({
+    initialValues: userInput,
+    validationSchema: validationSchemas[activeStep],
+    validateOnChange: true,
+    validateOnBlur: true,
+    onSubmit: async (values) => {
+      // Update parent state
+      setUserInput(values);
+
+      if (activeStep === steps.length - 1) {
+        // Final submission
+        await handleAddResume(values);
+      } else {
+        // Move to next step
+        handleNext();
+      }
+    },
+  });
+
+  // Sync formik values with parent state
+  React.useEffect(() => {
+    formik.setValues(userInput);
+  }, [activeStep]);
 
   const isStepOptional = (step) => {
     return step === 1;
@@ -36,21 +154,19 @@ function Steps({ userInput, setUserInput, setFinish }) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
     }
-
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
   };
 
   const handleBack = () => {
+    setUserInput(formik.values); // Save current values
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+
   const handleSkip = () => {
     if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
       throw new Error("You can't skip a step that isn't optional.");
     }
-
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped((prevSkipped) => {
       const newSkipped = new Set(prevSkipped.values());
@@ -61,147 +177,503 @@ function Steps({ userInput, setUserInput, setFinish }) {
 
   const handleReset = () => {
     setActiveStep(0);
+    formik.resetForm();
   };
 
   const addSkill = (inputSkill) => {
     if (inputSkill) {
-      if (userInput.skills.includes(inputSkill)) {
-        alert("skill already exists... add another")
+      const trimmedSkill = inputSkill.trim().toUpperCase();
+      if (formik.values.skills.includes(trimmedSkill)) {
+        swal("Duplicate", "Skill already exists", "warning");
       } else {
-        setUserInput({ ...userInput, skills: [...userInput.skills, inputSkill] })
+        formik.setFieldValue('skills', [...formik.values.skills, trimmedSkill]);
+        if (userSkillRef.current) {
+          userSkillRef.current.value = '';
+        }
       }
     }
-  }
+  };
 
-// removeSkill
-const removeSkill=(skill)=>
-{
-  setUserInput({...userInput,skills:userInput.skills.filter(item=>item!=skill)})
-}
+  const removeSkill = (skill) => {
+    formik.setFieldValue(
+      'skills',
+      formik.values.skills.filter((item) => item !== skill)
+    );
+  };
+
+  const handleAddResume = async (values) => {
+    const { name, jobTitle, location } = values.personalDetails;
+
+    if (name && jobTitle && location) {
+      try {
+        const result = await addResumeAPI(values);
+        console.log(result);
+        swal("Success", "Resume added successfully!", "success");
+        setFinish(true);
+      } catch (err) {
+        console.log(err);
+        swal("Error", "Failed to add resume. Please try again.", "error");
+      }
+    } else {
+      swal("Error", "Please fill all required fields", "error");
+    }
+  };
 
   const renderStepContent = (step) => {
     switch (step) {
-      case 0: return (
-        <div>
-          <h3>Personal Details</h3>
-          <div className='d-flex row p-3'>
-            <TextField id="Standard-basic" label="Full Name" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, name: e.target.value } })} value={userInput.personalDetails.name} />
-            <TextField id="Standard-basic" label="Job Title" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, jobTitle: e.target.value } })} value={userInput.personalDetails.jobTitle} />
-            <TextField id="Standard-basic" label="Location" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, location: e.target.value } })} value={userInput.personalDetails.location} />
+      case 0:
+        return (
+          <div>
+            <h3>Personal Details</h3>
+            <div className="d-flex row p-3">
+              <TextField
+                id="name"
+                name="personalDetails.name"
+                label="Full Name"
+                variant="standard"
+                value={formik.values.personalDetails.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.name &&
+                  Boolean(formik.errors.personalDetails?.name)
+                }
+                helperText={
+                  formik.touched.personalDetails?.name &&
+                  formik.errors.personalDetails?.name
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="jobTitle"
+                name="personalDetails.jobTitle"
+                label="Job Title"
+                variant="standard"
+                value={formik.values.personalDetails.jobTitle}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.jobTitle &&
+                  Boolean(formik.errors.personalDetails?.jobTitle)
+                }
+                helperText={
+                  formik.touched.personalDetails?.jobTitle &&
+                  formik.errors.personalDetails?.jobTitle
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="location"
+                name="personalDetails.location"
+                label="Location"
+                variant="standard"
+                value={formik.values.personalDetails.location}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.location &&
+                  Boolean(formik.errors.personalDetails?.location)
+                }
+                helperText={
+                  formik.touched.personalDetails?.location &&
+                  formik.errors.personalDetails?.location
+                }
+                fullWidth
+                margin="normal"
+              />
+            </div>
           </div>
-        </div>
-      )
-      case 1: return (
-        <div>
-          <h3>Contact Details</h3>
-          <div className='d-flex row p-3'>
-            <TextField id="Standard-basic" label="Email" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, email: e.target.value } })} value={userInput.personalDetails.email} />
-              
-            <TextField id="Standard-basic" label="Phone Number" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, phone: e.target.value } })} value={userInput.personalDetails.phone} />
+        );
 
-            <TextField id="Standard-basic" label="Github Profile Link" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, github: e.target.value } })} value={userInput.personalDetails.github} />
-
-            <TextField id="Standard-basic" label="Linkedin Profile Link" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, linkedIn: e.target.value } })} value={userInput.personalDetails.linkedIn} />
-
-            <TextField id="Standard-basic" label="Portfolio Link" variant="standard" onChange={e => setUserInput({ ...userInput, personalDetails: { ...userInput.personalDetails, portfolio: e.target.value } })} value={userInput.personalDetails.portfolio} />
+      case 1:
+        return (
+          <div>
+            <h3>Contact Details</h3>
+            <div className="d-flex row p-3">
+              <TextField
+                id="email"
+                name="personalDetails.email"
+                label="Email"
+                variant="standard"
+                value={formik.values.personalDetails.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.email &&
+                  Boolean(formik.errors.personalDetails?.email)
+                }
+                helperText={
+                  formik.touched.personalDetails?.email &&
+                  formik.errors.personalDetails?.email
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="phone"
+                name="personalDetails.phone"
+                label="Phone Number"
+                variant="standard"
+                value={formik.values.personalDetails.phone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.phone &&
+                  Boolean(formik.errors.personalDetails?.phone)
+                }
+                helperText={
+                  formik.touched.personalDetails?.phone &&
+                  formik.errors.personalDetails?.phone
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="github"
+                name="personalDetails.github"
+                label="Github Profile Link"
+                variant="standard"
+                value={formik.values.personalDetails.github}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.github &&
+                  Boolean(formik.errors.personalDetails?.github)
+                }
+                helperText={
+                  formik.touched.personalDetails?.github &&
+                  formik.errors.personalDetails?.github
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="linkedIn"
+                name="personalDetails.linkedIn"
+                label="LinkedIn Profile Link"
+                variant="standard"
+                value={formik.values.personalDetails.linkedIn}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.linkedIn &&
+                  Boolean(formik.errors.personalDetails?.linkedIn)
+                }
+                helperText={
+                  formik.touched.personalDetails?.linkedIn &&
+                  formik.errors.personalDetails?.linkedIn
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="portfolio"
+                name="personalDetails.portfolio"
+                label="Portfolio Link"
+                variant="standard"
+                value={formik.values.personalDetails.portfolio}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.personalDetails?.portfolio &&
+                  Boolean(formik.errors.personalDetails?.portfolio)
+                }
+                helperText={
+                  formik.touched.personalDetails?.portfolio &&
+                  formik.errors.personalDetails?.portfolio
+                }
+                fullWidth
+                margin="normal"
+              />
+            </div>
           </div>
-        </div>
-      )
-      case 2: return (
-        <div>
-          <h3>Education Details</h3>
-          <div className='d-flex row p-3'>
-            <TextField id="Standard-basic" label="Course Name" variant="standard" onChange={e => setUserInput({ ...userInput, education: { ...userInput.education, course: e.target.value } })} value={userInput.education.course} />
-            <TextField id="Standard-basic" label="College Name" variant="standard" onChange={e => setUserInput({ ...userInput, education: { ...userInput.education, college: e.target.value } })} value={userInput.education.college} />
-            <TextField id="Standard-basic" label="University" variant="standard" onChange={e => setUserInput({ ...userInput, education: { ...userInput.education, university: e.target.value } })} value={userInput.education.university} />
-            <TextField id="Standard-basic" label="Year of Passout" variant="standard" onChange={e => setUserInput({ ...userInput, education: { ...userInput.education, year: e.target.value } })} value={userInput.education.year} />
-          </div>
-        </div>
-      )
-      case 3: return (
-        <div>
-          <h3>Professional Details</h3>
-          <div className='d-flex row p-3'>
-            <TextField id="Standard-basic" label="Job or Internship" variant="standard" onChange={e => setUserInput({ ...userInput, experience: { ...userInput.experience, job: e.target.value } })} value={userInput.experience.job} />
-            <TextField id="Standard-basic" label="Company Name" variant="standard" onChange={e => setUserInput({ ...userInput, experience: { ...userInput.experience, company: e.target.value } })} value={userInput.experience.company} />
-            <TextField id="Standard-basic" label="location" variant="standard" onChange={e => setUserInput({ ...userInput, experience: { ...userInput.experience, location: e.target.value } })} value={userInput.experience.location} />
-            <TextField id="Standard-basic" label="Duration" variant="standard" onChange={e => setUserInput({ ...userInput, experience: { ...userInput.experience, duration: e.target.value } })} value={userInput.experience.duration} />
+        );
 
+      case 2:
+        return (
+          <div>
+            <h3>Education Details</h3>
+            <div className="d-flex row p-3">
+              <TextField
+                id="course"
+                name="education.course"
+                label="Course Name"
+                variant="standard"
+                value={formik.values.education.course}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.education?.course &&
+                  Boolean(formik.errors.education?.course)
+                }
+                helperText={
+                  formik.touched.education?.course &&
+                  formik.errors.education?.course
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="college"
+                name="education.college"
+                label="College Name"
+                variant="standard"
+                value={formik.values.education.college}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.education?.college &&
+                  Boolean(formik.errors.education?.college)
+                }
+                helperText={
+                  formik.touched.education?.college &&
+                  formik.errors.education?.college
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="university"
+                name="education.university"
+                label="University"
+                variant="standard"
+                value={formik.values.education.university}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.education?.university &&
+                  Boolean(formik.errors.education?.university)
+                }
+                helperText={
+                  formik.touched.education?.university &&
+                  formik.errors.education?.university
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="year"
+                name="education.year"
+                label="Year of Passout"
+                variant="standard"
+                value={formik.values.education.year}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.education?.year &&
+                  Boolean(formik.errors.education?.year)
+                }
+                helperText={
+                  formik.touched.education?.year &&
+                  formik.errors.education?.year
+                }
+                fullWidth
+                margin="normal"
+              />
+            </div>
           </div>
-        </div>
-      )
-      case 4: return (
-        <div>
-          <h3>Skills</h3>
-          <div className='d-flex row p-3'>
-            <Box sx={{ width: '100%' }}>
-              <Stack spacing={2} direction="row" sx={{ flexWrap: "wrap", gap: "10px", padding: "10px" }}>
-                {/* <TextField id="Standard-basic" label="Add Skill" variant="standard" /> */}
-                <input ref={userSkillRef} type="text" className='form-control' placeholder='add skill' />
-                <Button onClick={() => addSkill(userSkillRef.current.value)} className='me-3' variant="text" sx={{ maxWidth: '40px' }}>Add</Button>
+        );
 
-              </Stack>
-              <div>
-                <h5>Suggestion</h5>
-                <div className="d-flex flex-wrap justify-content-between my-3">
-                  {
-                    suggestionSkills.map(userSkill => (
-                      <Button onClick={() => addSkill(userSkill)} variant="outlined">{userSkill}</Button>
-                    ))
-                  }
+      case 3:
+        return (
+          <div>
+            <h3>Professional Details</h3>
+            <div className="d-flex row p-3">
+              <TextField
+                id="job"
+                name="experience.job"
+                label="Job or Internship"
+                variant="standard"
+                value={formik.values.experience.job}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.experience?.job &&
+                  Boolean(formik.errors.experience?.job)
+                }
+                helperText={
+                  formik.touched.experience?.job &&
+                  formik.errors.experience?.job
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="company"
+                name="experience.company"
+                label="Company Name"
+                variant="standard"
+                value={formik.values.experience.company}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.experience?.company &&
+                  Boolean(formik.errors.experience?.company)
+                }
+                helperText={
+                  formik.touched.experience?.company &&
+                  formik.errors.experience?.company
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="exp-location"
+                name="experience.location"
+                label="Location"
+                variant="standard"
+                value={formik.values.experience.location}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.experience?.location &&
+                  Boolean(formik.errors.experience?.location)
+                }
+                helperText={
+                  formik.touched.experience?.location &&
+                  formik.errors.experience?.location
+                }
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                id="duration"
+                name="experience.duration"
+                label="Duration"
+                variant="standard"
+                value={formik.values.experience.duration}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.experience?.duration &&
+                  Boolean(formik.errors.experience?.duration)
+                }
+                helperText={
+                  formik.touched.experience?.duration &&
+                  formik.errors.experience?.duration
+                }
+                fullWidth
+                margin="normal"
+              />
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div>
+            <h3>Skills</h3>
+            <div className="d-flex row p-3">
+              <Box sx={{ width: '100%' }}>
+                <Stack
+                  spacing={2}
+                  direction="row"
+                  sx={{ flexWrap: 'wrap', gap: '10px', padding: '10px' }}
+                >
+                  <input
+                    ref={userSkillRef}
+                    type="text"
+                    className="form-control"
+                    placeholder="Add skill"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addSkill(userSkillRef.current.value);
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={() => addSkill(userSkillRef.current.value)}
+                    className="me-3"
+                    variant="text"
+                    sx={{ maxWidth: '40px' }}
+                  >
+                    Add
+                  </Button>
+                </Stack>
+
+                {formik.touched.skills && formik.errors.skills && (
+                  <Typography color="error" variant="caption" sx={{ ml: 2 }}>
+                    {formik.errors.skills}
+                  </Typography>
+                )}
+
+                <div>
+                  <h5>Suggestions</h5>
+                  <div className="d-flex flex-wrap justify-content-between my-3">
+                    {suggestionSkills.map((userSkill, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => addSkill(userSkill)}
+                        variant="outlined"
+                        sx={{ m: 0.5 }}
+                      >
+                        {userSkill}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
 
-              </div>
-              <div>
-                <h5>Add Skills</h5>
-                <div className="d-flex justify-content-between">
-                  {
-                    userInput.skills.length > 0 ? userInput.skills.map(skill => (
-                      <span className='btn btn-primary d-flex align-items-center justify-content-center'>{skill} <button onClick={()=>removeSkill(skill)} className='btn text-light'>X</button></span>
-                    )) : <p>nothing to display</p>
-                  }
+                <div>
+                  <h5>Added Skills</h5>
+                  <div className="d-flex flex-wrap">
+                    {formik.values.skills.length > 0 ? (
+                      formik.values.skills.map((skill, index) => (
+                        <span
+                          key={index}
+                          className="btn btn-primary d-flex align-items-center justify-content-center m-1"
+                        >
+                          {skill}
+                          <button
+                            onClick={() => removeSkill(skill)}
+                            className="btn text-light ms-2"
+                            type="button"
+                          >
+                            X
+                          </button>
+                        </span>
+                      ))
+                    ) : (
+                      <p>No skills added yet</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Box>
+              </Box>
+            </div>
           </div>
-        </div>
-      )
-      case 5: return (
-        <div>
-          <h3>Proffesional Summary</h3>
-          <div className='d-flex row p-3'>
-            <TextField id="Standard-multiline-static" label="write a short summary your self" multiline rows={4} defaultValue="Eg:im passionate full-stack developer" variant="standard" onChange={e => setUserInput({ ...userInput, summary: e.target.value })} value={userInput.summary.duration} />
+        );
+
+      case 5:
+        return (
+          <div>
+            <h3>Professional Summary</h3>
+            <div className="d-flex row p-3">
+              <TextField
+                id="summary"
+                name="summary"
+                label="Write a short summary about yourself"
+                multiline
+                rows={4}
+                placeholder="E.g., I'm a passionate full-stack developer with experience in React and Node.js..."
+                variant="standard"
+                value={formik.values.summary}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.summary && Boolean(formik.errors.summary)}
+                helperText={formik.touched.summary && formik.errors.summary}
+                fullWidth
+                margin="normal"
+              />
+            </div>
           </div>
-        </div>
-      )
-      default: return Null
+        );
+
+      default:
+        return null;
     }
-  }
-
-// handleAddResume
-
-const handleAddResume = async()=>{
-  // alert("api called")
-  const{name,jobTitle,location}=userInput.personalDetails
-
-  if(name && jobTitle && location){
-    // alert("api called")
-    try {
-      const result = await addResumeAPI(userInput)
-      console.log(result)
-      swal("Success", "Resume added", "success");
-      setFinish(true)
-    } catch (err) {
-      console.log(err)
-      swal("Error", "Resume failed", "error");
-
-    }
-  }
-  else{
-    swal("Error", "Resume failed", "error");
-  }
-}
-
+  };
 
   return (
     <div>
@@ -225,10 +697,11 @@ const handleAddResume = async()=>{
             );
           })}
         </Stepper>
+
         {activeStep === steps.length ? (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>
-              All steps completed - you&apos;re finished
+              All steps completed - you're finished
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
               <Box sx={{ flex: '1 1 auto' }} />
@@ -237,39 +710,40 @@ const handleAddResume = async()=>{
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-            <Box>
-              {renderStepContent(activeStep)}
-            </Box>
+            <Typography sx={{ mt: 2, mb: 1 }}>
+              Step {activeStep + 1}
+            </Typography>
+            <form onSubmit={formik.handleSubmit}>
+              <Box>{renderStepContent(activeStep)}</Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Button
-                color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
-              <Box sx={{ flex: '1 1 auto' }} />
-              {isStepOptional(activeStep) && (
-                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                  Skip
+              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                <Button
+                  color="inherit"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  sx={{ mr: 1 }}
+                >
+                  Back
                 </Button>
-              )}
-              {activeStep === steps.length - 1
-              ?
-              <Button onClick={handleAddResume}>Finish</Button>:
-              <Button onClick={handleNext}>NEXT</Button>
-              }
-                  
-              
-            </Box>
+                <Box sx={{ flex: '1 1 auto' }} />
+                {isStepOptional(activeStep) && (
+                  <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
+                    Skip
+                  </Button>
+                )}
+                <Button
+                  type="submit"
+                  disabled={!formik.isValid && formik.submitCount > 0}
+                >
+                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                </Button>
+              </Box>
+            </form>
           </React.Fragment>
         )}
       </Box>
     </div>
-  )
+  );
 }
 
-export default Steps
+export default Steps;

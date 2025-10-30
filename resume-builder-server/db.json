@@ -233,6 +233,38 @@
       ],
       "summary": "jinrignsdgisnrigusgosuens",
       "id": 8
+    },
+    {
+      "personalDetails": {
+        "name": "Ashish",
+        "jobTitle": "Developer",
+        "location": "kakkanad",
+        "email": "ashishprasannan186@gmail.com",
+        "phone": "9037316232",
+        "github": "https://github.com/Matrix404x",
+        "linkedIn": "https://github.com/Matrix404x",
+        "portfolio": "https://github.com/Matrix404x"
+      },
+      "education": {
+        "course": "B Tech computer science",
+        "college": "College of engineering chengannur",
+        "university": "KTU",
+        "year": "2025"
+      },
+      "experience": {
+        "job": "Internship",
+        "company": "Luminar Technolabs",
+        "location": "Kakkanad",
+        "duration": "6 months"
+      },
+      "skills": [
+        "MERN",
+        "NODE",
+        "EXPRESS",
+        "MONGODB"
+      ],
+      "summary": "yigirifghbwibgbrigibsisbefsdnfsibfeifiysvfisbidfnbsuegfevbgsidnjfnjs",
+      "id": 9
     }
   ],
   "history": []
