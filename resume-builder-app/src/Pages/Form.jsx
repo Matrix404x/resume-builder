@@ -48,7 +48,7 @@ function Form() {
         <div className='row p-5'>
           <div className="col-6">
 
-            <Steps userInput={userInput} setUserInput={setUserInput} setFinish={setf} />
+            <Steps userInput={userInput} setUserInput={setUserInput} setFinish={setFinish} />
 
           </div>
 
