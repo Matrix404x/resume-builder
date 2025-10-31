@@ -122,20 +122,20 @@ function Steps({ userInput, setUserInput, setFinish }) {
     validateOnChange: true,
     validateOnBlur: true,
     onSubmit: async (values) => {
-      // Update parent state
-      setUserInput(values);
-
       if (activeStep === steps.length - 1) {
-        // Final submission
         await handleAddResume(values);
       } else {
-        // Move to next step
         handleNext();
       }
     },
   });
 
-  // Sync formik values with parent state
+  // ⭐ KEY FIX: Sync Formik values to parent state in real-time
+  React.useEffect(() => {
+    setUserInput(formik.values);
+  }, [formik.values]);
+
+  // Sync parent state to Formik when step changes
   React.useEffect(() => {
     formik.setValues(userInput);
   }, [activeStep]);
@@ -159,7 +159,6 @@ function Steps({ userInput, setUserInput, setFinish }) {
   };
 
   const handleBack = () => {
-    setUserInput(formik.values); // Save current values
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
