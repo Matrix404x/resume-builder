@@ -296,6 +296,42 @@
       ],
       "summary": "enofwibfaehfbiafnkjanfwaeihfinwraghiabfiahbnfiabfiarhrb",
       "id": 10
+    },
+    {
+      "personalDetails": {
+        "name": "Ashish Prasannan",
+        "jobTitle": "Developer",
+        "location": "kakkanad",
+        "email": "ashishprasannan186@gmail.com",
+        "phone": "9037316232",
+        "github": "https://github.com/Matrix404x",
+        "linkedIn": "https://github.com/Matrix404x",
+        "portfolio": "https://github.com/Matrix404x"
+      },
+      "education": {
+        "course": "CES",
+        "college": "College of Engineering Chengannur",
+        "university": "KTU",
+        "year": "2025"
+      },
+      "experience": {
+        "job": "Iternship",
+        "company": "Luminar Technolabs",
+        "location": "Kakkanad",
+        "duration": "6 months"
+      },
+      "skills": [
+        "MEARN",
+        "REACT",
+        "EXPRESS",
+        "MONGODB",
+        "JAVASCRIPT",
+        "GIT",
+        "UI/UX",
+        "ANGULAR"
+      ],
+      "summary": "ihbvbvvbsiuobvousbavufbdvusrbvdsurbvdubvdvkmvaibrubbguyrbgauyhbkjnklmfwaoiehfuoahifk[paeohfjaepjfbeafifiafayfbafbafyf",
+      "id": 11
     }
   ],
   "history": []
