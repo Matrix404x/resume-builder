@@ -6,8 +6,9 @@ import { Button, Divider, Stack, Typography } from '@mui/material';
 import { FaFileDownload } from 'react-icons/fa';
 import Edit from '../Components/Edit.jsx';
 import { FaHistory } from 'react-icons/fa';
-import jsPDF from 'jspdf'
+import jsPDF from 'jsPDF'
 import html2canvas from 'html2canvas'
+import { addDownloadHistory } from '../services/allAPI.js';
 
 
 
@@ -26,6 +27,17 @@ function Preview({ userInput, finish }) {
     const pdfHeight = pdf.internal.pageSize.getHeight()
     pdf.addImage(imgURL, 'PNG', 0, 0, pdfWidth, pdfHeight)
     pdf.save('resume.pdf')
+
+    // getDate
+    const localTimeDate = new Date()
+    const timeStamp = `${localTimeDate.toLocaleDateString()},${localTimeDate.toLocaleDateString}`
+
+    try {
+      const result = await addDownloadHistoryAPI({ ...userInput, imgURL, timeStamp })
+      console.log(result)
+    } catch (err) {
+      console.log(err)
+    }
   }
   return (
     <div>
