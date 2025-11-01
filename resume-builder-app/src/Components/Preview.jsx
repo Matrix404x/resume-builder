@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { Link } from 'react-router-dom';
@@ -8,11 +8,13 @@ import Edit from '../Components/Edit.jsx';
 import { FaHistory } from 'react-icons/fa';
 import jsPDF from 'jsPDF'
 import html2canvas from 'html2canvas'
-import { addDownloadHistory } from '../services/allAPI.js';
-
+import { addDownloadHistoryAPI} from '../services/allAPI.js'
 
 
 function Preview({ userInput, finish }) {
+
+  const[downloadStatus,setDownloadStatus] = useState(false)
+
   console.log(userInput);
 
   const downloadCV = async () => {
@@ -35,6 +37,7 @@ function Preview({ userInput, finish }) {
     try {
       const result = await addDownloadHistoryAPI({ ...userInput, imgURL, timeStamp })
       console.log(result)
+      setDownloadStatus(true)
     } catch (err) {
       console.log(err)
     }
@@ -52,7 +55,10 @@ function Preview({ userInput, finish }) {
               {/* edit */}
               <div><Edit /></div>
               {/* history */}
-              <Link to={'/history'} className='btn fs-3 text-primary'><FaHistory /></Link>
+              { downloadStatus&&<>
+              < Link to={'/history'} className='btn fs-3 text-primary'><FaHistory /></Link>
+              </>
+              }
               {/* back to generator */}
               <Link to={'/resume-generator'} className='text-primary'>BACK</Link>
             </div >}

@@ -14,18 +14,18 @@ export const editResumeAPI = async(id,resume)=>{
 
 // addDownloadHistory
 
-export const addDownloadHistory = async(resume)=>{
+export const addDownloadHistoryAPI = async(resume)=>{
     return await commonAPI("POST",`${baseUrl}/history`,resume)
 }
 
 // getDownloadHistory
 
-export const getDownloadHistory = async()=>{
+export const getDownloadHistoryAPI = async()=>{
     return await commonAPI("GET",`${baseUrl}/history`,{})
 }
 
 // deleteDownloadHistory
 
-export const deleteDownloadHistory = async(id)=>{
+export const deleteDownloadHistoryAPI = async(id)=>{
     return await commonAPI("DELETE",`${baseUrl}/history/${id}`,{})
 }
