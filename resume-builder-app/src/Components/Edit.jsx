@@ -29,7 +29,7 @@ const style = {
   }
 };
 
-function Edit({ resumeId }) {
+function Edit({ resumeId, setUserInput: setParentUserInput }) {
   const [userInput, setUserInput] = React.useState({
     personalDetails: {
       name: '',
@@ -124,10 +124,15 @@ function Edit({ resumeId }) {
       console.log('Update result:', result);
 
       swal("Success", "Resume updated successfully!", "success");
+      // Update parent state if setter provided so Preview updates without a full reload
+      if (typeof setParentUserInput === 'function' && result?.data) {
+        try {
+          setParentUserInput(result.data);
+        } catch (e) {
+          console.warn('Failed to update parent state after edit', e);
+        }
+      }
       handleClose();
-
-      // Optionally reload the page or update parent state
-      window.location.reload();
 
     } catch (err) {
       console.error('Error updating resume:', err);
@@ -429,7 +434,7 @@ function Edit({ resumeId }) {
                 Cancel
               </Button>
               <Button variant="contained" color="primary" onClick={handleUpdate}>
-                Save Changes
+                Update
               </Button>
             </Box>
           </Box>

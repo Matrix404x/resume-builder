@@ -55,7 +55,7 @@ function Form() {
           </div>
 
           <div className="col-6">
-            <Preview userInput={userInput} resumeId={resumeId} />
+            <Preview userInput={userInput} resumeId={resumeId} setUserInput={setUserInput} />
 
           </div>
 

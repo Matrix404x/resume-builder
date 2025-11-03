@@ -10,7 +10,7 @@ import jsPDF from 'jspdf'; // ✅ FIX 1: lowercase 'jspdf'
 import html2canvas from 'html2canvas';
 import { addDownloadHistoryAPI } from '../services/allAPI.js';
 
-function Preview({ userInput, finish, resumeId }) {
+function Preview({ userInput, finish, resumeId, setUserInput }) {
   const [downloadStatus, setDownloadStatus] = useState(false);
 
   console.log(userInput);
@@ -109,7 +109,7 @@ function Preview({ userInput, finish, resumeId }) {
                   </button>
                   
                   {/* edit */}
-                  <div><Edit resumeId={resumeId} /></div>
+                  <div><Edit resumeId={resumeId} setUserInput={setUserInput} /></div>
                   
                   {/* history */}
                   {downloadStatus && (
