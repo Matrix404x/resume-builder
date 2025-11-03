@@ -6,13 +6,12 @@ const commonAPI = async (httpMethod, url, reqBody) => {
         url,
         data: reqBody
     }
-    // return axios instance for api call
-
-    return await axios(reqConfig).then(res => {
-        return res
-    }).catch(err => {
-        return err
-    })
+    try {
+        const response = await axios(reqConfig);
+        return response;
+    } catch (err) {
+        throw err;
+    }
 }
 
 export default commonAPI

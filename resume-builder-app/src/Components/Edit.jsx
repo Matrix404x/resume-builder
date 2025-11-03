@@ -27,8 +27,9 @@ const style = {
   }
 };
 
-function Edit() {
-
+function Edit({resumeId}) {
+// console.log(resumeId);
+const[userInput,setUserInput]=React.useState({})
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => {
     setOpen(true);
@@ -36,6 +37,21 @@ function Edit() {
   const handleClose = () => {
     setOpen(false);
   };
+
+  // getEditResumeDetails
+
+  const getEditResumeDetails=async()=>{
+    try{
+      const result = await getResumeAPI(resumeId);
+      console.log(result);
+    }catch(err){
+      console.log(err);
+    }
+  }
+
+  React.useEffect(()=>{
+    resumeId && getEditResumeDetails()
+  },[resumeId])
   return (
     <div>
       <button onClick={handleOpen} className='btn text-primary fs-2'><FaEdit /></button>
@@ -127,4 +143,4 @@ function Edit() {
   )
 }
 
-export default Edit
+export default Edit ;
