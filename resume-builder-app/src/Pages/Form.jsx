@@ -42,7 +42,7 @@ function Form() {
         {finish ?<div className="row">
           <div className="col-3"></div>
           <div className="col-8">
-            <Preview userInput={userInput} setUserInput={setUserInput} finish={finish} />
+            <Preview userInput={userInput} setUserInput={setUserInput} finish={finish} resumeId={resumeId} />
           </div>
           <div className="col-1"> </div>
         </div>:
@@ -50,12 +50,12 @@ function Form() {
         <div className='row p-5'>
           <div className="col-6">
 
-            <Steps userInput={userInput} setUserInput={setUserInput} setFinish={setFinish} />
+            <Steps userInput={userInput} setUserInput={setUserInput} setFinish={setFinish} setResumeId={setResumeId} />
 
           </div>
 
           <div className="col-6">
-            <Preview userInput={userInput} />
+            <Preview userInput={userInput} resumeId={resumeId} />
 
           </div>
 

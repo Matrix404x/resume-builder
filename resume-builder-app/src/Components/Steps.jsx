@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import { addResumeAPI } from '../services/allAPI';
 import swal from 'sweetalert';
 
-function Steps({ userInput, setUserInput, setFinish,setResumeId }) {
+function Steps({ userInput, setUserInput, setFinish, setResumeId }) {
   const steps = [
     'Basic Information',
     'Contact Details',
@@ -209,7 +209,7 @@ function Steps({ userInput, setUserInput, setFinish,setResumeId }) {
         console.log(result);
         swal("Success", "Resume added successfully!", "success");
         setFinish(true);
-        setResumeId(result.data.id);
+        setResumeId(result?.data?.id || result?.data?._id || null);
       } catch (err) {
         console.log(err);
         swal("Error", "Failed to add resume. Please try again.", "error");

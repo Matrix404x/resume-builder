@@ -9,7 +9,7 @@ export const addResumeAPI = async(resume)=>{
 // editResumeAPI - PUT
 
 export const editResumeAPI = async(id,resume)=>{
-    return await commonAPI("PUT",`${baseUrl}/resume/${id}`,resume)
+    return await commonAPI("PUT",`${baseUrl}/resumes/${id}`,resume)
 }
 
 // addDownloadHistory
@@ -33,5 +33,5 @@ export const deleteDownloadHistoryAPI = async(id)=>{
 // getResumeAPI
 
 export const getResumeAPI=async(id)=>{
-    return await commonAPI("GET",`${baseUrl}/resume/${id}`,{})
+    return await commonAPI("GET",`${baseUrl}/resumes/${id}`,{})
 }
