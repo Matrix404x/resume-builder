@@ -115,23 +115,10 @@ function Edit({ resumeId, setUpdateResume }) {
   // Update resume
   const handleUpdate = async () => {
     try {
-      if (!resumeId) {
-        swal("Error", "No resume ID found", "error");
-        return;
-      }
-
-      const result = await editResumeAPI(resumeId, userInput);
-      console.log('Update result:', result);
-
-      swal("Success", "Resume updated successfully!", "success");
-      // Update parent state if setter provided so Preview updates without a full reload
-      if (typeof setUpdateResume === 'function' && result?.data) {
-        try {
-          setUpdateResume(result.data);
-        } catch (e) {
-          console.warn('Failed to update parent state after edit', e);
-        }
-      }
+      const result = await editResumeAPI(userInput?.id,userInput)
+      console.log(result)
+      setUpdateResume(result?.data);
+      swal("Success", "Resume updated successfully", "success");
       handleClose();
 
     } catch (err) {
