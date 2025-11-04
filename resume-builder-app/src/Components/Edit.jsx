@@ -29,7 +29,7 @@ const style = {
   }
 };
 
-function Edit({ resumeId, setUserInput: setParentUserInput }) {
+function Edit({ resumeId, setUpdateResume }) {
   const [userInput, setUserInput] = React.useState({
     personalDetails: {
       name: '',
@@ -125,9 +125,9 @@ function Edit({ resumeId, setUserInput: setParentUserInput }) {
 
       swal("Success", "Resume updated successfully!", "success");
       // Update parent state if setter provided so Preview updates without a full reload
-      if (typeof setParentUserInput === 'function' && result?.data) {
+      if (typeof setUpdateResume === 'function' && result?.data) {
         try {
-          setParentUserInput(result.data);
+          setUpdateResume(result.data);
         } catch (e) {
           console.warn('Failed to update parent state after edit', e);
         }

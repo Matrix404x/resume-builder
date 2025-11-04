@@ -6,7 +6,7 @@ import { Button, Divider, Stack, Typography } from '@mui/material';
 import { FaFileDownload } from 'react-icons/fa';
 import Edit from '../Components/Edit.jsx';
 import { FaHistory } from 'react-icons/fa';
-import jsPDF from 'jspdf'; // ✅ FIX 1: lowercase 'jspdf'
+import jsPDF from 'jspdf'; 
 import html2canvas from 'html2canvas';
 import { addDownloadHistoryAPI } from '../services/allAPI.js';
 
@@ -109,7 +109,7 @@ function Preview({ userInput, finish, resumeId, setUserInput }) {
                   </button>
                   
                   {/* edit */}
-                  <div><Edit resumeId={resumeId} setUserInput={setUserInput} /></div>
+                  <div><Edit resumeId={resumeId} setUpdateResume={setUserInput} /></div>
                   
                   {/* history */}
                   {downloadStatus && (
